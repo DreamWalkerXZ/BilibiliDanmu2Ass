@@ -26,14 +26,12 @@ def format_time(time_raw):
     return hour + ':' + minute + ':' + second
 
 class Danmu:
-    def __init__(self, appear_time_raw, mode, color_raw, text):
-        self.appear_time_raw = appear_time_raw
-        disappear_time_raw = appear_time_raw + 8
-        self.appear_time = format_time(appear_time_raw)
-        self.disappear_time = format_time(disappear_time_raw)
+    def __init__(self, appear_time, disappear_time, mode, color, text):
+        self.appear_time = appear_time
+        self.disappear_time = disappear_time
         self.mode = mode
-        self.color = r"\c&H" + str(hex(color_raw))[2:].upper()
-        if self.color == r"\c&HFFFFFF":
+        self.color = color
+        if self.color == r"\c&HFFFFFF": # 默认白色则删去,压缩空间
             self.color = ""
         self.text = text
 
@@ -50,8 +48,7 @@ def get_danmu_list(danmu_url):
     danmu_list = []
     for item in danmu_raw_list:
         m = re.match(r'<d p="(.*?),(.*?),(.*?),(.*?),(.*?)>(.*?)</d>', item) # group(3和5)废弃
-        danmu_list.append(Danmu(float(m.group(1)), int(m.group(2)), int(m.group(4)), m.group(6)))
-    danmu_list.sort(key = lambda x: x.appear_time_raw)
+        danmu_list.append(Danmu(format_time(float(m.group(1))), format_time(float(m.group(1)) + 8), int(m.group(2)), r"\c&H" + str(hex(int(m.group(4))))[2:].upper(), m.group(6)))
     return danmu_list
 
 def generate_ass(danmu_list):
