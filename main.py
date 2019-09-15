@@ -3,6 +3,23 @@ import re
 
 headers = {"user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.87 Safari/537.36"}
 
+class Danmu:
+    def __init__(self, appear_time, disappear_time, mode, color, text):
+        self.appear_time = appear_time
+        self.disappear_time = disappear_time
+        self.mode = mode
+        self.color = color
+        if self.color == r"\c&HFFFFFF": # 默认白色则删去,压缩空间
+            self.color = ""
+        self.text = text
+
+def get_cid(url):
+    html = requests.get(url, headers = headers).content.decode('utf-8')
+    if "cid" in html:
+        return re.search(r'"cid":(\d*)', html).group(1)
+    else:
+        return "x"
+
 def format_time(time_raw):
     hour = str(int(time_raw / 3600))
     if hour != '0':
@@ -24,23 +41,6 @@ def format_time(time_raw):
         else:
             second = second + ".00"
     return hour + ':' + minute + ':' + second
-
-class Danmu:
-    def __init__(self, appear_time, disappear_time, mode, color, text):
-        self.appear_time = appear_time
-        self.disappear_time = disappear_time
-        self.mode = mode
-        self.color = color
-        if self.color == r"\c&HFFFFFF": # 默认白色则删去,压缩空间
-            self.color = ""
-        self.text = text
-
-def get_cid(url):
-    html = requests.get(url, headers = headers).content.decode('utf-8')
-    if "cid" in html:
-        return re.search(r'"cid":(\d*)', html).group(1)
-    else:
-        return "x"
 
 def get_danmu_list(danmu_url):
     danmu_raw = requests.get(danmu_url, headers = headers).content.decode('utf-8')
